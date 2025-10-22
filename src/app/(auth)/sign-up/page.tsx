@@ -2,13 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useCreateUserWithEmailAndPassword, useSignInWithGoogle } from "react-firebase-hooks/auth";
+import { useCreateUserWithEmailAndPassword, useSendEmailVerification, useSignInWithGoogle } from "react-firebase-hooks/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { auth } from "@/app/firebase/config";
 import { signUpSchema, SignUpSchema } from "@/schemas/sign-up-schema";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -17,6 +17,7 @@ import { toast } from "sonner";
 export default function SignUpPage() {
   const router = useRouter()
   const [createUserWithEmailAndPassword] = useCreateUserWithEmailAndPassword(auth);
+  const [sendEmailVerification] = useSendEmailVerification(auth);
   const [signInWithGoogle] = useSignInWithGoogle(auth);
 
   const form = useForm<SignUpSchema>({
@@ -32,6 +33,7 @@ export default function SignUpPage() {
     try {
       const res = await createUserWithEmailAndPassword(data.email, data.password);
       if (res?.user) {
+        await sendEmailVerification();
         router.push("sign-in");
       }
     } catch (error) {

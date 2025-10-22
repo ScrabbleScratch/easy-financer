@@ -9,10 +9,9 @@ import { useForm } from "react-hook-form";
 
 import { auth } from "@/app/firebase/config";
 import { resetPasswordSchema, ResetPasswordSchema } from "@/schemas/reset-password-schema";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
 import { toast } from "sonner";

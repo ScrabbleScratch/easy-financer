@@ -89,11 +89,9 @@ export default function SignInPage() {
                 </FormItem>
               )}
             />
-            <div className="mt-3 flex flex-col justify-center items-center gap-6">
-              <div className="mt-3 flex flex-col justify-center items-center gap-2">
-                <Button type="submit" className="w-50 self-center">Sign In</Button>
-                <Link href="reset-password" className="w-auto text-xs">Forgot password?</Link>
-              </div>
+            <Link href="reset-password" className="w-auto text-xs">Forgot password?</Link>
+            <div className="mt-3 flex flex-col justify-center items-center gap-2">
+              <Button type="submit" className="w-50 self-center">Sign In</Button>
               <Link href="sign-up" className="w-auto text-xs">Don't have an account? <span className="text-blue-500">Sign Up</span></Link>
             </div>
           </form>
