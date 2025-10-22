@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -34,6 +35,10 @@ export default function SignInPage() {
       }
     } catch (error) {
       console.error("Error signing in:", error);
+      const message = error instanceof Error ? error.message : String(error);
+      toast("Error signing in", {
+        description: message,
+      });
     }
   };
 
@@ -45,6 +50,10 @@ export default function SignInPage() {
       }
     } catch (error) {
       console.error("Error signing in with Google:", error);
+      const message = error instanceof Error ? error.message : String(error);
+      toast("Error signing in with Google", {
+        description: message,
+      });
     }
   };
 
