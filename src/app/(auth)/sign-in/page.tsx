@@ -31,7 +31,7 @@ export default function SignInPage() {
     try {
       const res = await signInWithEmailAndPassword(data.email, data.password);
       if (res?.user) {
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (error) {
       console.error("Error signing in:", error);
