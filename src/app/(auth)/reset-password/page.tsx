@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
-import { toast } from "sonner";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -34,10 +33,6 @@ export default function ResetPasswordPage() {
       setEmailSent(res);
     } catch (error) {
       console.error("Error sending password reset email:", error);
-      const message = error instanceof Error ? error.message : String(error);
-      toast("Error sending password reset email", {
-        description: message,
-      });
     }
   };
 

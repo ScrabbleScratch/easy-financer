@@ -12,7 +12,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
 
 export default function SignUpPage() {
   const router = useRouter()
@@ -38,10 +37,6 @@ export default function SignUpPage() {
       }
     } catch (error) {
       console.error("Error signing up:", error);
-      const message = error instanceof Error ? error.message : String(error);
-      toast("Error signing up", {
-        description: message,
-      });
     }
   };
 

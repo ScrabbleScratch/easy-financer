@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useSignInWithEmailAndPassword, useSignInWithGoogle } from "react-firebase-hooks/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,10 +12,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
 
 export default function SignInPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const mode = searchParams.get("mode");
   const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
   const [signInWithGoogle] = useSignInWithGoogle(auth);
 
@@ -35,10 +36,6 @@ export default function SignInPage() {
       }
     } catch (error) {
       console.error("Error signing in:", error);
-      const message = error instanceof Error ? error.message : String(error);
-      toast("Error signing in", {
-        description: message,
-      });
     }
   };
 
@@ -50,10 +47,6 @@ export default function SignInPage() {
       }
     } catch (error) {
       console.error("Error signing in with Google:", error);
-      const message = error instanceof Error ? error.message : String(error);
-      toast("Error signing in with Google", {
-        description: message,
-      });
     }
   };
 
