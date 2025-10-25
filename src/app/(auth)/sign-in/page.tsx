@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useSignInWithEmailAndPassword, useSignInWithGoogle } from "react-firebase-hooks/auth";
@@ -7,17 +8,26 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { auth } from "@/app/firebase/config";
+import { parseFirebaseError } from "@/lib/firebase-utils";
 import { signInSchema, SignInSchema } from "@/schemas/sign-in-schema";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircleIcon, CheckCircle2Icon } from "lucide-react";
+
+enum AlertMode {
+  VERIFY = "verifyEmail",
+  CREATE_ERROR = "createError",
+  LOGIN_ERROR = "loginError",
+}
 
 export default function SignInPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const mode = searchParams.get("mode");
-  const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
+  const [alertMode, setAlertMode] = useState(searchParams.get("mode"))
+  const [signInWithEmailAndPassword, user, loading, errorLogin] = useSignInWithEmailAndPassword(auth);
   const [signInWithGoogle] = useSignInWithGoogle(auth);
 
   const form = useForm<SignInSchema>({
@@ -30,6 +40,7 @@ export default function SignInPage() {
 
   const onSubmit = async (data: SignInSchema) => {
     try {
+      setAlertMode(null);
       const res = await signInWithEmailAndPassword(data.email, data.password);
       if (res?.user) {
         router.push("/dashboard");
@@ -41,6 +52,7 @@ export default function SignInPage() {
 
   const onSignInWithGoogle = async () => {
     try {
+      setAlertMode(null);
       const res = await signInWithGoogle();
       if (res?.user) {
         router.push("/");
@@ -50,10 +62,54 @@ export default function SignInPage() {
     }
   };
 
+  const getModeAlert = () => {
+    switch (alertMode) {
+      case AlertMode.VERIFY:
+        return (
+          <Alert>
+            <CheckCircle2Icon />
+            <AlertTitle>Verify your account</AlertTitle>
+            <AlertDescription>
+              A verification link was sent to your email
+            </AlertDescription>
+          </Alert>
+        );
+      case AlertMode.CREATE_ERROR:
+        return (
+          <Alert variant="destructive">
+            <AlertCircleIcon />
+            <AlertTitle>Unable to sign in</AlertTitle>
+            <AlertDescription>
+              Couldn't sign in to your account. Try again or contact support if the problem persist
+            </AlertDescription>
+          </Alert>
+        );
+      case AlertMode.LOGIN_ERROR:
+        return (
+          <Alert variant="destructive">
+            <AlertCircleIcon />
+            <AlertTitle>Unable to sign in</AlertTitle>
+            <AlertDescription>
+              {parseFirebaseError(errorLogin)}
+            </AlertDescription>
+          </Alert>
+        )
+      default:
+        return <></>;
+    }
+  }
+
+  useEffect(() => {
+    if (errorLogin) {
+      setAlertMode(AlertMode.LOGIN_ERROR);
+    }
+  }, [errorLogin])
+
   return (
     <div className="max-w-md mx-auto my-30 p-8 border-2 rounded-3xl shadow-lg">
       <h1 className="mb-6 text-center text-3xl font-bold">Sign In</h1>
       <div className="flex flex-col gap-6 items-center">
+        {getModeAlert()}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="w-full flex flex-col gap-4">
             <FormField
