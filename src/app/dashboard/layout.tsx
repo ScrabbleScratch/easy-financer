@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { redirect, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuthState, useSendEmailVerification, useSignOut } from "react-firebase-hooks/auth";
+import { useAtom } from "jotai";
+
+import { userState } from "@/atoms/user-state";
 
 import { auth } from "@/app/firebase/config";
 import { createUser, getUser } from "@/lib/actions/auth-actions";
@@ -19,36 +22,41 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   const router = useRouter();
-  const [allowed, setAllowed] = useState(false);
-  const [user, loading, error] = useAuthState(auth);
+  const [authState, loading, error] = useAuthState(auth);
   const [sendEmailVerification] = useSendEmailVerification(auth);
   const [signOut] = useSignOut(auth);
 
+  const [user, setUser] = useAtom(userState);
+
   const validateUser = async (shouldRedirect?: boolean) => {
-    if (!user) return;
+    if (!authState) return;
 
     // Sign out and redirect if email is not verified
-    if ((!user.email || !user.emailVerified)) {
+    if ((!authState.email || !authState.emailVerified)) {
       await sendEmailVerification();
       await signOut();
       return router.replace("/auth/sign-in?mode=verifyEmail");
     }
 
     // Validate user existance in db
-    const exists = await getUser(user.email);
-    if (exists) {
-      setAllowed(true);
+    const existingUser = await getUser(authState.email);
+    if (existingUser) {
+      setUser({
+        isAuthenticated: true,
+        id: existingUser.id,
+        email: existingUser.email,
+      });
       return;
     }
-    
+
     if (shouldRedirect) {
       await signOut();
       router.replace("/auth/sign-in?mode=createError")
       return;
     }
-    
+
     // Create user in db
-    await createUser(user.email);
+    await createUser(authState.email);
 
     // Retry user validation
     await validateUser(true);
@@ -57,13 +65,15 @@ export default function DashboardLayout({
   useEffect(() => {
     if (loading) return;
 
-    if (!user?.email || error) {
-      setAllowed(false);
+    if (!authState?.email || error) {
+      setUser({
+        isAuthenticated: false,
+      });
       router.replace("/auth/sign-in");
     } else {
       validateUser();
     }
-  }, [user, loading, error])
+  }, [authState, loading, error])
 
   if (loading) {
     return (
@@ -80,7 +90,7 @@ export default function DashboardLayout({
       </Empty>
     );
   }
-  if (user && !allowed) {
+  if (authState && !user.isAuthenticated) {
     return (
       <Empty className="w-full">
         <EmptyHeader>
@@ -93,7 +103,7 @@ export default function DashboardLayout({
       </Empty>
     );
   }
-  if (user && allowed) {
+  if (authState && user.isAuthenticated) {
     return (
       <>
         <nav className="h-15 p-2 flex flex-row justify-between items-center shadow-md">
@@ -111,4 +121,16 @@ export default function DashboardLayout({
       </>
     );
   }
+  // Non implemented cases fallback
+  return (
+    <Empty className="w-full">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <Spinner />
+        </EmptyMedia>
+        <EmptyTitle>Loading...</EmptyTitle>
+        <EmptyDescription>Preparing dashboard.</EmptyDescription>
+      </EmptyHeader>
+    </Empty>
+  );
 }
