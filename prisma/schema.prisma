@@ -15,6 +15,22 @@ datasource db {
 }
 
 model User {
-  id    String @id @default(cuid())
-  email String @unique
+  id           String        @id @default(uuid())
+  email        String        @unique
+  transactions Transaction[]
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+}
+
+model Transaction {
+  id        Int             @id @default(autoincrement())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id])
+  amount    Float
+  concept   String?
+  type      TransactionType
+  createdAt DateTime        @default(now())
 }
