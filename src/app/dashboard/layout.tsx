@@ -24,31 +24,44 @@ export default function DashboardLayout({
   const [sendEmailVerification] = useSendEmailVerification(auth);
   const [signOut] = useSignOut(auth);
 
-  const validateUser = async (redirect?: boolean) => {
+  const validateUser = async (shouldRedirect?: boolean) => {
     if (!user) return;
 
+    // Sign out and redirect if email is not verified
     if ((!user.email || !user.emailVerified)) {
       await sendEmailVerification();
       await signOut();
       return router.replace("/auth/sign-in?mode=verifyEmail");
     }
 
-    if (await getUser(user.email)) {
+    // Validate user existance in db
+    const exists = await getUser(user.email);
+    if (exists) {
       setAllowed(true);
-    } else if (redirect) {
-      await signOut();
-      return router.replace("/auth/sign-in?mode=createError")
-    } else {
-      await createUser(user.email);
-      validateUser(true);
+      return;
     }
+    
+    if (shouldRedirect) {
+      await signOut();
+      router.replace("/auth/sign-in?mode=createError")
+      return;
+    }
+    
+    // Create user in db
+    await createUser(user.email);
+
+    // Retry user validation
+    await validateUser(true);
   }
 
   useEffect(() => {
-    if (!loading && !error && user?.email) {
-      validateUser();
-    } else {
+    if (loading) return;
+
+    if (!user?.email || error) {
       setAllowed(false);
+      router.replace("/auth/sign-in");
+    } else {
+      validateUser();
     }
   }, [user, loading, error])
 
@@ -67,8 +80,18 @@ export default function DashboardLayout({
       </Empty>
     );
   }
-  if (!user || error) {
-    redirect("/auth/sign-in");
+  if (user && !allowed) {
+    return (
+      <Empty className="w-full">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <Spinner />
+          </EmptyMedia>
+          <EmptyTitle>Finishing setup</EmptyTitle>
+          <EmptyDescription>Just a moment while we verify your account.</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
+    );
   }
   if (user && allowed) {
     return (

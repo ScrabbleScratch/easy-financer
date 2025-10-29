@@ -15,10 +15,14 @@ export async function getUser(email: string) {
 }
 
 export async function createUser(email: string) {
-  const user = await prisma.user.create({
-    data: {
+  const user = await prisma.user.upsert({
+    where: {
       email,
     },
+    create: {
+      email,
+    },
+    update: {},
   });
 
   return user;
