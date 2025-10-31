@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useSignInWithEmailAndPassword, useSignInWithGoogle } from "react-firebase-hooks/auth";
@@ -23,11 +23,11 @@ enum AlertMode {
   LOGIN_ERROR = "loginError",
 }
 
-export default function SignInPage() {
+function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [alertMode, setAlertMode] = useState(searchParams.get("mode"))
-  const [signInWithEmailAndPassword, user, loading, errorLogin] = useSignInWithEmailAndPassword(auth);
+  const [signInWithEmailAndPassword, , , errorLogin] = useSignInWithEmailAndPassword(auth);
   const [signInWithGoogle] = useSignInWithGoogle(auth);
 
   const form = useForm<SignInSchema>({
@@ -80,7 +80,7 @@ export default function SignInPage() {
             <AlertCircleIcon />
             <AlertTitle>Unable to sign in</AlertTitle>
             <AlertDescription>
-              Couldn't sign in to your account. Try again or contact support if the problem persist
+              Couldn&apos;t sign in to your account. Try again or contact support if the problem persist
             </AlertDescription>
           </Alert>
         );
@@ -141,7 +141,7 @@ export default function SignInPage() {
             <Link href="reset-password" className="w-auto text-xs">Forgot password?</Link>
             <div className="mt-3 flex flex-col justify-center items-center gap-2">
               <Button type="submit" className="w-50 self-center">Sign In</Button>
-              <Link href="sign-up" className="w-auto text-xs">Don't have an account? <span className="text-blue-500">Sign Up</span></Link>
+              <Link href="sign-up" className="w-auto text-xs">Don&apos;t have an account? <span className="text-blue-500">Sign Up</span></Link>
             </div>
           </form>
         </Form>
@@ -149,5 +149,13 @@ export default function SignInPage() {
         <Button variant="outline" className="w-50" onClick={onSignInWithGoogle}>Continue with Google</Button>
       </div>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="max-w-md mx-auto my-30 p-8">Loading...</div>}>
+      <SignInForm />
+    </Suspense>
   );
 }

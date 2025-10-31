@@ -18,8 +18,8 @@ import { AlertCircleIcon } from "lucide-react";
 
 export default function SignUpPage() {
   const router = useRouter()
-  const [createUserWithEmailAndPassword, user, loadingCreate, errorCreate] = useCreateUserWithEmailAndPassword(auth);
-  const [sendEmailVerification, sending, errorEmail] = useSendEmailVerification(auth);
+  const [createUserWithEmailAndPassword, , loadingCreate, errorCreate] = useCreateUserWithEmailAndPassword(auth);
+  const [sendEmailVerification, , errorEmail] = useSendEmailVerification(auth);
   const [signInWithGoogle] = useSignInWithGoogle(auth);
 
   const form = useForm<SignUpSchema>({
