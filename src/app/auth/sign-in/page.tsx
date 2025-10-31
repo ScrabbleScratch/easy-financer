@@ -55,7 +55,7 @@ export default function SignInPage() {
       setAlertMode(null);
       const res = await signInWithGoogle();
       if (res?.user) {
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (error) {
       console.error("Error signing in with Google:", error);
