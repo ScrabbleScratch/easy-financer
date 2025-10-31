@@ -41,7 +41,7 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto my-30 p-8 border-2 rounded-3xl shadow-lg">
+    <div className="max-w-md mx-auto my-12 p-8 border-2 rounded-3xl shadow-lg">
       <h1 className="mb-6 text-center text-3xl font-bold">Reset Password</h1>
       {emailSent ? (
         <div className="w-full flex flex-col gap-5">

@@ -54,7 +54,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto my-30 p-8 border-2 rounded-3xl shadow-lg">
+    <div className="max-w-md mx-auto my-12 p-8 border-2 rounded-3xl shadow-lg">
       <h1 className="mb-6 text-center text-3xl font-bold">Sign Up</h1>
       <div className="flex flex-col gap-6 items-center">
         {(errorCreate || errorEmail) && (

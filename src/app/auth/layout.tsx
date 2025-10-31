@@ -33,7 +33,9 @@ export default function RootLayout({
           </Link>
         </div>
       </nav>
-      {children}
+      <div className="p-6">
+        {children}
+      </div>
     </>
   );
 }
