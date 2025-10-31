@@ -117,7 +117,9 @@ export default function DashboardLayout({
             Sign Out
           </Button>
         </nav>
-        {children}
+        <div className="p-6">
+          {children}
+        </div>
       </>
     );
   }
