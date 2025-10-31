@@ -33,7 +33,6 @@ export default function AddTransactionPage() {
   const onSubmit = async (data: AddTransactionSchema) => {
     if (!user.isAuthenticated) return;
 
-    console.log("Form data:", data);
     const res = await createTransaction(user.id, data.type as TransactionType, data.amount, data.date, data.concept);
     if (res) {
       router.push("/dashboard");
@@ -41,7 +40,7 @@ export default function AddTransactionPage() {
   };
 
   return (
-    <div className="max-w-lg mx-auto my-20 p-8 border-2 rounded-3xl shadow-lg">
+    <div className="max-w-lg mx-auto p-8 border-2 rounded-3xl shadow-lg">
       <h1 className="mb-6 text-center text-3xl font-bold">Add Transaction</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full flex flex-col gap-4">
@@ -103,6 +102,7 @@ export default function AddTransactionPage() {
                     value={field.value}
                     onChange={field.onChange}
                     placeholder="Select transaction date"
+                    maxDate={new Date()}
                   />
                 </FormControl>
                 <FormDescription>
