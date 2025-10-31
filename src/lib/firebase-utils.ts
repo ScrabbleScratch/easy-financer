@@ -1,5 +1,5 @@
-export function parseFirebaseError(error: any): string {
-  if (error && error.code) {
+export function parseFirebaseError(error: Error | { code?: string } | null | undefined): string {
+  if (error && 'code' in error && error.code) {
     switch (error.code) {
       case "auth/email-already-in-use":
         return "Email is already in use.";
