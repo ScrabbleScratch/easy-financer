@@ -33,7 +33,7 @@ export default function DashboardHomePage() {
     // Get client's timezone offset in minutes
     const timezoneOffset = new Date().getTimezoneOffset();
 
-    const transactions = await getMonthlyTransactions(user.id, undefined, undefined, timezoneOffset);
+    const transactions = await getMonthlyTransactions(user.id);
     setMonthlyTransactions(transactions);
 
     const expenses = transactions

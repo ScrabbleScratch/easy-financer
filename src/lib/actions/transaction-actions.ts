@@ -34,30 +34,27 @@ export async function getAllTransactions(userId: string) {
 export async function getMonthlyTransactions(
   userId: string,
   year?: number,
-  month?: number,
-  timeZoneOffset?: number
+  month?: number
 ) {
   // Use current date if year or month not specified
   const now = new Date();
   const targetYear = year ?? now.getFullYear();
   const targetMonth = month ?? now.getMonth() + 1; // getMonth() returns 0-11, we need 1-12
-  const offset = timeZoneOffset ?? 0;
 
   // Calculate start of month in client's timezone, then convert to UTC
-  // getTimezoneOffset() returns positive values when behind UTC (e.g., 360 for UTC-6)
   const localStartOfMonth = new Date(targetYear, targetMonth - 1, 1, 0, 0, 0, 0);
-  const startDate = new Date(localStartOfMonth.getTime() + offset * 60 * 1000);
 
   // Calculate start of next month
   const localStartOfNextMonth = new Date(targetYear, targetMonth, 1, 0, 0, 0, 0);
-  const endDate = new Date(localStartOfNextMonth.getTime() + offset * 60 * 1000);
+
+  console.log("Dates:", localStartOfMonth, localStartOfNextMonth);
 
   const transactions = await prisma.transaction.findMany({
     where: {
       userId,
       date: {
-        gte: startDate,
-        lt: endDate,
+        gte: localStartOfMonth,
+        lt: localStartOfNextMonth,
       },
     },
     orderBy: {

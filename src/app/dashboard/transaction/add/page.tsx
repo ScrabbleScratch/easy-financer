@@ -26,7 +26,7 @@ export default function AddTransactionPage() {
       type: "DEPOSIT",
       amount: 0,
       concept: "",
-      date: new Date(),
+      date: new Date(new Date().setHours(0, 0, 0, 0)),
     },
   });
 
