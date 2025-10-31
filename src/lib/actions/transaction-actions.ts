@@ -31,22 +31,34 @@ export async function getAllTransactions(userId: string) {
   return transactions;
 }
 
-export async function getMonthlyTransactions(userId: string, year?: number, month?: number) {
+export async function getMonthlyTransactions(
+  userId: string,
+  year?: number,
+  month?: number,
+  timeZoneOffset?: number
+) {
   // Use current date if year or month not specified
   const now = new Date();
   const targetYear = year ?? now.getFullYear();
   const targetMonth = month ?? now.getMonth() + 1; // getMonth() returns 0-11, we need 1-12
+  const offset = timeZoneOffset ?? 0;
 
-  // Build date filter for the specified month
-  const dateFilter = {
-    gte: new Date(targetYear, targetMonth - 1, 1), // First day of the month
-    lt: new Date(targetYear, targetMonth, 1), // First day of next month
-  };
+  // Calculate start of month in client's timezone, then convert to UTC
+  // getTimezoneOffset() returns positive values when behind UTC (e.g., 360 for UTC-6)
+  const localStartOfMonth = new Date(targetYear, targetMonth - 1, 1, 0, 0, 0, 0);
+  const startDate = new Date(localStartOfMonth.getTime() + offset * 60 * 1000);
+
+  // Calculate start of next month
+  const localStartOfNextMonth = new Date(targetYear, targetMonth, 1, 0, 0, 0, 0);
+  const endDate = new Date(localStartOfNextMonth.getTime() + offset * 60 * 1000);
 
   const transactions = await prisma.transaction.findMany({
     where: {
       userId,
-      date: dateFilter,
+      date: {
+        gte: startDate,
+        lt: endDate,
+      },
     },
     orderBy: {
       date: 'desc',
