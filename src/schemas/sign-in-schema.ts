@@ -6,4 +6,4 @@ export const signInSchema = z
     password: z.string().nonempty("Password is required"),
   });
 
-export interface SignInSchema extends z.infer<typeof signInSchema> {};
+export type SignInSchema = z.infer<typeof signInSchema>;

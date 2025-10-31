@@ -4,4 +4,4 @@ export const resetPasswordSchema = z.object({
   email: z.email(),
 });
 
-export interface ResetPasswordSchema extends z.infer<typeof resetPasswordSchema> {};
+export type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;

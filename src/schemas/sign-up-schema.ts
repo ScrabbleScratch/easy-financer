@@ -22,4 +22,4 @@ export const signUpSchema = z
     }
   });
 
-export interface SignUpSchema extends z.infer<typeof signUpSchema> {};
+export type SignUpSchema = z.infer<typeof signUpSchema>;

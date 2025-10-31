@@ -20,4 +20,4 @@ export const addTransactionSchema = z.object({
     .nonoptional("Transaction date is required"),
 });
 
-export interface AddTransactionSchema extends z.infer<typeof addTransactionSchema> { };
+export type AddTransactionSchema = z.infer<typeof addTransactionSchema>;
