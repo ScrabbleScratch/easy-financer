@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from "react";
+import { useEffect, useState } from "react";
 import { format } from "date-fns";
-import { enUS, es } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -15,13 +15,14 @@ import {
 } from "@/components/ui/popover";
 
 interface DatePickerProps {
-  value?: Date
-  onChange?: (date: Date | undefined) => void
-  placeholder?: string
-  className?: string
-  disabled?: boolean
-  minDate?: Date
-  maxDate?: Date
+  value?: Date;
+  onChange?: (date: Date | undefined) => void;
+  placeholder?: string;
+  className?: string;
+  disabled?: boolean;
+  minDate?: Date;
+  maxDate?: Date;
+  timeZone?: string;
 }
 
 export default function DatePicker({
@@ -32,7 +33,16 @@ export default function DatePicker({
   disabled = false,
   minDate,
   maxDate,
+  timeZone,
 }: DatePickerProps) {
+  const [dateTimeZone, setDateTimeZone] = useState(timeZone);
+
+  useEffect(() => {
+    if (!timeZone) {
+      setDateTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+    }
+  }, []);
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -63,6 +73,7 @@ export default function DatePicker({
             if (maxDate && date > maxDate) return true;
             return false;
           }}
+          timeZone={dateTimeZone}
         />
       </PopoverContent>
     </Popover>
