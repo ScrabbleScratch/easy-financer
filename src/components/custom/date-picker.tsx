@@ -20,6 +20,8 @@ interface DatePickerProps {
   placeholder?: string
   className?: string
   disabled?: boolean
+  minDate?: Date
+  maxDate?: Date
 }
 
 export default function DatePicker({
@@ -28,6 +30,8 @@ export default function DatePicker({
   placeholder = "Selecciona una fecha",
   className,
   disabled = false,
+  minDate,
+  maxDate,
 }: DatePickerProps) {
   return (
     <Popover>
@@ -52,6 +56,13 @@ export default function DatePicker({
           selected={value}
           onSelect={onChange}
           autoFocus
+          startMonth={minDate}
+          endMonth={maxDate}
+          disabled={(date) => {
+            if (minDate && date < minDate) return true;
+            if (maxDate && date > maxDate) return true;
+            return false;
+          }}
         />
       </PopoverContent>
     </Popover>
