@@ -47,8 +47,6 @@ export async function getMonthlyTransactions(
   // Calculate start of next month
   const localStartOfNextMonth = new Date(targetYear, targetMonth, 1, 0, 0, 0, 0);
 
-  console.log("Dates:", localStartOfMonth, localStartOfNextMonth);
-
   const transactions = await prisma.transaction.findMany({
     where: {
       userId,
