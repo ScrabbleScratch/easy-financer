@@ -6,10 +6,13 @@ import { useAtomValue } from "jotai";
 
 import { userState } from "@/atoms/user-state";
 
+import { cn } from "@/lib/utils";
 import { getAvailableFunds, getMonthlyTransactions } from "@/lib/actions/transaction-actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Transaction, TransactionType } from "@/generated/prisma";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function DashboardHomePage() {
   const user = useAtomValue(userState);
@@ -71,6 +74,53 @@ export default function DashboardHomePage() {
           Register Transaction
         </Button>
       </Link>
+      <Accordion type="single" className="w-xl px-4 shadow-md" collapsible>
+        <AccordionItem value="history">
+          <AccordionTrigger>Transactions history</AccordionTrigger>
+          <AccordionContent>
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-neutral-50">
+                  <TableHead>Date</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Concept</TableHead>
+                  <TableHead>Type</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {monthlyTransactions.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="p-8 text-center text-neutral-400">
+                      No transactions found in the current month
+                    </TableCell>
+                  </TableRow>
+                ) : monthlyTransactions.map((transaction, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{transaction.date.toLocaleDateString()}</TableCell>
+                    <TableCell
+                      className={cn({
+                        "text-emerald-600": transaction.type === TransactionType.DEPOSIT,
+                        "text-orange-700": transaction.type === TransactionType.WITHDRAWAL,
+                      })}
+                    >
+                      ${transaction.amount.toFixed(2)}
+                    </TableCell>
+                    <TableCell>{transaction.concept ?? "-"}</TableCell>
+                    <TableCell
+                      className={cn({
+                        "text-emerald-600": transaction.type === TransactionType.DEPOSIT,
+                        "text-orange-700": transaction.type === TransactionType.WITHDRAWAL,
+                      })}
+                    >
+                      {transaction.type}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }
