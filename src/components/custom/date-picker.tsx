@@ -41,7 +41,7 @@ export default function DatePicker({
     if (!timeZone) {
       setDateTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
     }
-  }, []);
+  }, [timeZone]);
 
   return (
     <Popover>

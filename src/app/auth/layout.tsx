@@ -22,7 +22,7 @@ export default function RootLayout({
     if (authState) {
       router.replace("/dashboard");
     }
-  }, [authState, loading, error])
+  }, [authState, loading, error, router])
 
   return (
     <>

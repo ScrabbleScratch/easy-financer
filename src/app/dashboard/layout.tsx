@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -28,7 +28,7 @@ export default function DashboardLayout({
 
   const [user, setUser] = useAtom(userState);
 
-  const validateUser = async (shouldRedirect?: boolean) => {
+  const validateUser = useCallback(async (shouldRedirect?: boolean) => {
     if (!authState) return;
 
     // Sign out and redirect if email is not verified
@@ -58,9 +58,18 @@ export default function DashboardLayout({
     // Create user in db
     await createUser(authState.email);
 
-    // Retry user validation
-    await validateUser(true);
-  }
+    // Create user in db
+    const newUser = await getUser(authState.email);
+    if (newUser) {
+      setUser({
+        isAuthenticated: true,
+        id: newUser.id,
+        email: newUser.email,
+      });
+    } else if (!shouldRedirect) {
+      await validateUser(true);
+    }
+  }, [router, authState, sendEmailVerification, signOut, setUser]);
 
   useEffect(() => {
     if (loading) return;
@@ -73,7 +82,7 @@ export default function DashboardLayout({
     } else {
       validateUser();
     }
-  }, [authState, loading, error])
+  }, [authState, loading, error, router, setUser, validateUser])
 
   if (loading) {
     return (

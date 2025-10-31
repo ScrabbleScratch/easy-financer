@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useAtomValue } from "jotai";
 
@@ -20,18 +20,15 @@ export default function DashboardHomePage() {
   const [monthlyTransactions, setMonthlyTransactions] = useState<Transaction[]>([]);
   const [monthlyExpenses, setMonthlyExpenses] = useState(0);
 
-  const handleGetFunds = async () => {
+  const handleGetFunds = useCallback(async () => {
     if (!user.isAuthenticated) return;
 
     const total = await getAvailableFunds(user.id);
     setAvailableFunds(total);
-  };
+  }, [user.isAuthenticated, user.id]);
 
-  const handleGetMonthlyTransactions = async () => {
+  const handleGetMonthlyTransactions = useCallback(async () => {
     if (!user.isAuthenticated) return;
-
-    // Get client's timezone offset in minutes
-    const timezoneOffset = new Date().getTimezoneOffset();
 
     const transactions = await getMonthlyTransactions(user.id);
     setMonthlyTransactions(transactions);
@@ -40,12 +37,12 @@ export default function DashboardHomePage() {
       .filter(t => t.type === TransactionType.WITHDRAWAL)
       .reduce((acc, curr) => acc + curr.amount, 0);
     setMonthlyExpenses(expenses);
-  };
+  }, [user.isAuthenticated, user.id]);
 
   useEffect(() => {
     handleGetFunds();
     handleGetMonthlyTransactions();
-  }, []);
+  }, [handleGetFunds, handleGetMonthlyTransactions]);
 
   return (
     <div className="flex flex-col justify-center items-center gap-6">
