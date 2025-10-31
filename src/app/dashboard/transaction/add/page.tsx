@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useAtomValue } from "jotai";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,11 +10,11 @@ import { userState } from "@/atoms/user-state";
 import { addTransactionSchema, AddTransactionSchema } from "@/schemas/add-transaction";
 import { createTransaction } from "@/lib/actions/transaction-actions";
 import { TransactionType } from "@/generated/prisma";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useRouter } from "next/navigation";
+import DatePicker from "@/components/custom/date-picker";
 
 export default function AddTransactionPage() {
   const router = useRouter();
@@ -25,6 +26,7 @@ export default function AddTransactionPage() {
       type: "DEPOSIT",
       amount: 0,
       concept: "",
+      date: new Date(),
     },
   });
 
@@ -32,7 +34,7 @@ export default function AddTransactionPage() {
     if (!user.isAuthenticated) return;
 
     console.log("Form data:", data);
-    const res = await createTransaction(user.id, data.type as TransactionType, data.amount, data.concept);
+    const res = await createTransaction(user.id, data.type as TransactionType, data.amount, data.date, data.concept);
     if (res) {
       router.push("/dashboard");
     }
@@ -86,6 +88,26 @@ export default function AddTransactionPage() {
                 <FormControl>
                   <Input {...field} value={field.value ?? ""} />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="date"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Date</FormLabel>
+                <FormControl>
+                  <DatePicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Select transaction date"
+                  />
+                </FormControl>
+                <FormDescription>
+                  Date in which the transaction was made
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

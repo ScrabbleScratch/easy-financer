@@ -15,6 +15,9 @@ export const addTransactionSchema = z.object({
     .normalize()
     .transform(val => val === "" ? null : val)
     .nullable(),
+  date: z
+    .date()
+    .nonoptional("Transaction date is required"),
 });
 
-export interface AddTransactionSchema extends z.infer<typeof addTransactionSchema> {};
+export interface AddTransactionSchema extends z.infer<typeof addTransactionSchema> { };
