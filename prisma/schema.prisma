@@ -32,5 +32,6 @@ model Transaction {
   amount    Float
   concept   String?
   type      TransactionType
+  date      DateTime        @default(now())
   createdAt DateTime        @default(now())
 }
