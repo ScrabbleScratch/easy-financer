@@ -21,7 +21,7 @@ export async function getAvailableFunds(userId: string) {
   return deposits - withdrawals;
 }
 
-export async function getUserTransactions(userId: string) {
+export async function getAllTransactions(userId: string) {
   const transactions = await prisma.transaction.findMany({
     where: {
       userId
@@ -31,13 +31,39 @@ export async function getUserTransactions(userId: string) {
   return transactions;
 }
 
-export async function createTransaction(userId: string, type: TransactionType, amount: number, concept?: string|null) {
+export async function getMonthlyTransactions(userId: string, year?: number, month?: number) {
+  // Use current date if year or month not specified
+  const now = new Date();
+  const targetYear = year ?? now.getFullYear();
+  const targetMonth = month ?? now.getMonth() + 1; // getMonth() returns 0-11, we need 1-12
+
+  // Build date filter for the specified month
+  const dateFilter = {
+    gte: new Date(targetYear, targetMonth - 1, 1), // First day of the month
+    lt: new Date(targetYear, targetMonth, 1), // First day of next month
+  };
+
+  const transactions = await prisma.transaction.findMany({
+    where: {
+      userId,
+      date: dateFilter,
+    },
+    orderBy: {
+      date: 'desc',
+    },
+  });
+
+  return transactions;
+}
+
+export async function createTransaction(userId: string, type: TransactionType, amount: number, date?: Date, concept?: string|null) {
   const transaction = await prisma.transaction.create({
     data: {
       userId,
       amount,
       type,
       concept,
+      date
     },
   });
 
